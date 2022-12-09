@@ -47,18 +47,30 @@ class Analyzer:
         ch0_stack = tifffile.imread(self.opath + self.pfx + self.sfx + 'ch0.tif')
         ch1_stack = tifffile.imread(self.opath + self.pfx + self.sfx + 'ch1.tif')
         ch2_stack = tifffile.imread(self.opath + self.pfx + self.sfx + 'ch2.tif')
-        img = ch0_stack[0]
         nt,nx,ny = ch0_stack.shape
-        from skimage import data
-        viewer = napari.Viewer()
-        viewer.add_image(data.astronaut())
-        napari.run()
+        for n in range(nt):
+            viewer = napari.Viewer()
+            viewer.window.resize(2000, 1000)
+            viewer.add_image(ch0_stack[n],name='DAPI',colormap='blue',visible=False)
+            viewer.add_image(blur(ch1_stack[n],sigma=1),name='GAPDH',colormap='green')
+            viewer.add_image(blur(ch2_stack[n],sigma=1),name='GBP5',colormap='red',visible=False)
+            napari.run()
+            shape = ch1_stack[n].shape
+            try:
+                labels = viewer.layers['Shapes'].to_labels(labels_shape=shape)
+                ch1_pts = viewer.layers['GAPDH-features-blob_log'].data
+                ch2_pts = viewer.layers['GBP5-features-blob_log'].data
+            except:
+                pass
+
         
     def detect_spots(self,ch1,ch2,ch1_thr,ch2_thr):
         det1 = LOGDetector(blur(ch1,sigma=1),threshold=ch1_thr)
         det1.detect()
         det2 = LOGDetector(blur(ch2,sigma=1),threshold=ch2_thr)
         det2.detect()
-        return det1.blobs_df, det2.blobs_df
+        pts1 = det1.blobs_df[['x','y']].to_numpy()
+        pts2 = det2.blobs_df[['x','y']].to_numpy()
+        return pts1, pts2
         
 

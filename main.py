@@ -3,7 +3,8 @@ from correct import Basic
 from manual import Analyzer
 
 paths = [
-'/research3/shared/cwseitz/Data/221206-Hela-IFNG-1h-1_1/',
+'/home/cwseitz/Desktop/Data/221206-Hela-IFNG-1h-1_1/'
+#'/research3/shared/cwseitz/Data/221206-Hela-IFNG-1h-1_1/',
 #'/research3/shared/cwseitz/Data/221206-Hela-IFNG-1h-2_1/',
 #'/research3/shared/cwseitz/Data/221206-Hela-IFNG-1h-3_2/',
 #'/research3/shared/cwseitz/Data/221206-Hela-IFNG-1h-4_1/',

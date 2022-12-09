@@ -19,7 +19,7 @@ class Basic:
         nt,nx,ny = 10,1844,1844
         ch0 = tifffile.imread(self.opath + self.prefix + '_mxtiled_ch0.tif')
         ch0_blocks = self.blockshaped(ch0,1844,1844)
-        basic = BaSiC(get_darkfield=True, lambda_flatfield_coef=100)
+        basic = BaSiC(get_darkfield=True)
         basic.fit(ch0_blocks)
         ch0_correct = basic.transform(ch0_blocks)
         ch0_correct = ch0_correct.astype(np.uint16)
@@ -33,7 +33,7 @@ class Basic:
 
         ch1 = tifffile.imread(self.opath + self.prefix + '_mxtiled_ch1.tif')
         ch1_blocks = self.blockshaped(ch1,1844,1844)
-        basic = BaSiC(get_darkfield=True, lambda_flatfield_coef=100)
+        basic = BaSiC(get_darkfield=True)
         basic.fit(ch1_blocks)
         ch1_correct = basic.transform(ch1_blocks)
         ch1_correct = ch1_correct.astype(np.uint16)
@@ -47,7 +47,7 @@ class Basic:
 
         ch2 = tifffile.imread(self.opath + self.prefix + '_mxtiled_ch2.tif')
         ch2_blocks = self.blockshaped(ch2,1844,1844)
-        basic = BaSiC(get_darkfield=True, lambda_flatfield_coef=100)
+        basic = BaSiC(get_darkfield=True)
         basic.fit(ch2_blocks)
         ch2_correct = basic.transform(ch2_blocks)
         ch2_correct = ch2_correct.astype(np.uint16)
