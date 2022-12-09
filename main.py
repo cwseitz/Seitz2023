@@ -1,6 +1,7 @@
 from tiler import Tiler
 from correct import Basic
 from manual import Analyzer
+from pathlib import Path
 
 paths = [
 '/home/cwseitz/mnt/gpu/Data/221206-Hela-IFNG-1h-1_1/',
@@ -29,22 +30,15 @@ def get_opath(ipath):
 def get_prefix(ipath):
     return ipath.split('/')[-2]
 
-filters = {
-'min_area': 10000,
-'max_area': 100000,
-'max_ecc': 1,
-'min_solid': 0
-}
-
-
 for ipath in paths:
     prefix = get_prefix(ipath)
     print("Processing " + prefix)
     opath = get_opath(ipath)
-    #tiler = Tiler(ipath,opath,prefix)
-    #tiler.tile()
-    #basic = Basic(opath,prefix)
-    #basic.correct()
-    analyzer = Analyzer(prefix,opath)
-    analyzer.analyze(filters)
+    Path(opath).mkdir(parents=True, exist_ok=True)
+    tiler = Tiler(ipath,opath,prefix)
+    tiler.tile()
+    basic = Basic(opath,prefix)
+    basic.correct()
+    #analyzer = Analyzer(prefix,opath)
+    #analyzer.analyze(filters)
 
