@@ -3,26 +3,25 @@ from correct import Basic
 from manual import Analyzer
 
 paths = [
-'/home/cwseitz/Desktop/Data/221206-Hela-IFNG-1h-1_1/'
-#'/research3/shared/cwseitz/Data/221206-Hela-IFNG-1h-1_1/',
-#'/research3/shared/cwseitz/Data/221206-Hela-IFNG-1h-2_1/',
-#'/research3/shared/cwseitz/Data/221206-Hela-IFNG-1h-3_2/',
-#'/research3/shared/cwseitz/Data/221206-Hela-IFNG-1h-4_1/',
-#'/research3/shared/cwseitz/Data/221130-Hela-IFNG-2h-1_1/',
-#'/research3/shared/cwseitz/Data/221130-Hela-IFNG-4h-3_1/',
-#'/research3/shared/cwseitz/Data/221130-Hela-IFNG-4h-3_2/',
-#'/research3/shared/cwseitz/Data/221130-Hela-IFNG-4h-4_1/',
-#'/research3/shared/cwseitz/Data/221130-Hela-IFNG-8h-1_1/',
-#'/research3/shared/cwseitz/Data/221130-Hela-IFNG-8h-2_1/',
-#'/research3/shared/cwseitz/Data/221130-Hela-IFNG-8h-3_1/',
-#'/research3/shared/cwseitz/Data/221130-Hela-IFNG-8h-4_1/'
-#'/research3/shared/cwseitz/Data/221206-Hela-IFNG-16h-1_1/',
-#'/research3/shared/cwseitz/Data/221206-Hela-IFNG-16h-2_1/',
-#'/research3/shared/cwseitz/Data/221206-Hela-IFNG-16h-3_1/',
-#'/research3/shared/cwseitz/Data/221206-Hela-IFNG-16h-4_1/',
-#'/research3/shared/cwseitz/Data/221206-Hela-IFNG-24h-1_1/',
-#'/research3/shared/cwseitz/Data/221206-Hela-IFNG-24h-3_1/',
-#'/research3/shared/cwseitz/Data/221206-Hela-IFNG-24h-4_1/'
+'/home/cwseitz/mnt/gpu/Data/221206-Hela-IFNG-1h-1_1/',
+#'/home/cwseitz/mnt/gpu/Data/221206-Hela-IFNG-1h-2_1/',
+#'/home/cwseitz/mnt/gpu/Data/221206-Hela-IFNG-1h-3_2/',
+#'/home/cwseitz/mnt/gpu/Data/221206-Hela-IFNG-1h-4_1/',
+#'/home/cwseitz/mnt/gpu/Data/221130-Hela-IFNG-2h-1_1/',
+#'/home/cwseitz/mnt/gpu/Data/221130-Hela-IFNG-4h-3_1/',
+#'/home/cwseitz/mnt/gpu/Data/221130-Hela-IFNG-4h-3_2/',
+#'/home/cwseitz/mnt/gpu/Data/221130-Hela-IFNG-4h-4_1/',
+#'/home/cwseitz/mnt/gpu/Data/221130-Hela-IFNG-8h-1_1/',
+#'/home/cwseitz/mnt/gpu/Data/221130-Hela-IFNG-8h-2_1/',
+#'/home/cwseitz/mnt/gpu/Data/221130-Hela-IFNG-8h-3_1/',
+#'/home/cwseitz/mnt/gpu/Data/221130-Hela-IFNG-8h-4_1/'
+#'/home/cwseitz/mnt/gpu/Data/221206-Hela-IFNG-16h-1_1/',
+#'/home/cwseitz/mnt/gpu/Data/221206-Hela-IFNG-16h-2_1/',
+#'/home/cwseitz/mnt/gpu/Data/221206-Hela-IFNG-16h-3_1/',
+#'/home/cwseitz/mnt/gpu/Data/221206-Hela-IFNG-16h-4_1/',
+#'/home/cwseitz/mnt/gpu/Data/221206-Hela-IFNG-24h-1_1/',
+#'/home/cwseitz/mnt/gpu/Data/221206-Hela-IFNG-24h-3_1/',
+#'/home/cwseitz/mnt/gpu/Data/221206-Hela-IFNG-24h-4_1/'
 ]
 
 def get_opath(ipath):
