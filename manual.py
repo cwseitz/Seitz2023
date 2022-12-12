@@ -7,6 +7,7 @@ from skimage.segmentation import mark_boundaries
 from skimage.restoration import rolling_ball
 from skimage.filters import gaussian
 from skimage.util import img_as_ubyte, img_as_uint
+from skimage.io import imsave
 from smlm.track import LOGDetector
 from smlm.filters import blur, boxcar
 from smlm.plot import anno_blob
@@ -77,6 +78,7 @@ class Analyzer:
                         df2.to_csv(self.opath + self.pfx + self.sfx + f'gbp5_{n}.csv')
                         self.plot_result(df1,df2,ch0_stack[n],
                                          self.filter(ch1_stack[n]),self.filter(ch2_stack[n]),labels,n)
+                        imsave(self.opath + self.pfx + self.sfx + f'nuc_mask_{n}.tif', labels)
                         flag = False
                     except Exception as e:
                         print(e)
