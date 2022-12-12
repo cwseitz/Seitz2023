@@ -3,7 +3,7 @@ from correct import Basic
 from manual import Analyzer
 from pathlib import Path
 
-path0 = '/home/cwseitz/mnt/gpu/Data/'
+path0 = '/research3/shared/cwseitz/Data/'
 
 paths = [
 #'221206-Hela-IFNG-1h-1_1/', #GAPDH channel is not very good
