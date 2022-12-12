@@ -45,5 +45,5 @@ for ipath in paths:
     #basic = Basic(opath,prefix)
     #basic.correct()
     analyzer = Analyzer(prefix,opath)
-    analyzer.analyze()
+    analyzer.analyze(n0=0)
 
