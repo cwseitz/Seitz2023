@@ -2,6 +2,7 @@ from tiler import Tiler
 from correct import Basic
 from manual import Analyzer
 from pathlib import Path
+from check import Checker
 
 path0 = '/research3/shared/cwseitz/Data/'
 
@@ -44,6 +45,8 @@ for ipath in paths:
     #tiler.tile()
     #basic = Basic(opath,prefix)
     #basic.correct()
-    analyzer = Analyzer(prefix,opath)
-    analyzer.analyze(n0=0)
+    #analyzer = Analyzer(prefix,opath)
+    #analyzer.analyze(n0=0)
+    checker = Checker(prefix,opath)
+    checker.check()
 
