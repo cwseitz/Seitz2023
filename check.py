@@ -39,11 +39,12 @@ class Checker:
 
         for n in range(ch0_stack.shape[0]):
             try:
+
                 df1 = pd.read_csv(self.opath + self.pfx + self.sfx + f'gapdh_{n}.csv')
                 df2 = pd.read_csv(self.opath + self.pfx + self.sfx + f'gbp5_{n}.csv')
                 mask1 = imread(self.opath + self.pfx + self.sfx + f'nuc_mask_{n}.tif')
                 mask2 = imread(self.opath + self.pfx + self.sfx + f'cyto_mask_{n}.tif')
-
+                print(f'Found all files for tile {n}') 
                 fig, ax = plt.subplots(figsize=(10,10)) 
                 rgb = self.get_rgb(ch0_stack[n],3*self.filter(ch1_stack[n]),3*self.filter(ch2_stack[n]))
                 rgb = mark_boundaries(rgb,mask1,color=(0.8,0.8,0.8))
@@ -57,4 +58,4 @@ class Checker:
                 plt.tight_layout()
                 plt.show()
             except Exception as e:
-                print(e)
+                print(f'Missing files for tile {n}') 

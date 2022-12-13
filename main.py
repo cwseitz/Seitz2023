@@ -4,7 +4,7 @@ from manual import Analyzer
 from pathlib import Path
 from check import Checker
 
-path0 = '/research3/shared/cwseitz/Data/'
+path0 = '/home/cwseitz/mnt/gpu/Data/'
 
 paths = [
 #'221206-Hela-IFNG-1h-1_1/', #GAPDH channel is not very good
@@ -40,7 +40,7 @@ for ipath in paths:
     prefix = get_prefix(ipath)
     print("Processing " + prefix)
     opath = get_opath(ipath)
-    Path(opath).mkdir(parents=True, exist_ok=True)
+    #Path(opath).mkdir(parents=True, exist_ok=True)
     #tiler = Tiler(ipath,opath,prefix)
     #tiler.tile()
     #basic = Basic(opath,prefix)
