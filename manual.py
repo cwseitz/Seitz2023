@@ -43,7 +43,7 @@ class Analyzer:
         blurred = blurred/blurred.max()
         blurred = img_as_uint(blurred)
         bg = rolling_ball(blurred,radius=5)    
-        return blurred-bg  
+        return image
     def analyze(self,n0=0):
         print("Loading dataset...")
         ch0_stack = tifffile.imread(self.opath + self.pfx + self.sfx + 'ch0.tif')

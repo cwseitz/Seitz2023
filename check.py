@@ -27,7 +27,7 @@ class Checker:
         blurred = blurred/blurred.max()
         blurred = img_as_uint(blurred)
         bg = rolling_ball(blurred,radius=5)    
-        return blurred-bg  
+        return image
 
     def check(self):
  

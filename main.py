@@ -40,7 +40,7 @@ for ipath in paths:
     prefix = get_prefix(ipath)
     print("Processing " + prefix)
     opath = get_opath(ipath)
-    #Path(opath).mkdir(parents=True, exist_ok=True)
+    Path(opath).mkdir(parents=True, exist_ok=True)
     #tiler = Tiler(ipath,opath,prefix)
     #tiler.tile()
     #basic = Basic(opath,prefix)
