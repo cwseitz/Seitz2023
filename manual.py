@@ -75,7 +75,7 @@ class Analyzer:
                         ch1_pts_labels = np.expand_dims(labels[ch1_pts[:,0],ch1_pts[:,1]],axis=1)
                         ch1_pts_int = np.expand_dims(ch1_stack[n][ch1_pts[:,0],ch1_pts[:,1]],axis=1)
                         ch1_pts = np.concatenate((ch1_pts,ch1_pts_labels,ch1_pts_int),axis=1)
-                        df1 = pd.DataFrame({'x':ch1_pts[:, 0],'y':ch1_pts[:, 1],'label':ch1_pts[:,2].'intensity':ch1_pts[:,3]})
+                        df1 = pd.DataFrame({'x':ch1_pts[:, 0],'y':ch1_pts[:, 1],'label':ch1_pts[:,2],'intensity':ch1_pts[:,3]})
                         df1.to_csv(self.opath + self.pfx + self.sfx + f'gapdh_{n}.csv')
                         ch2_pts_labels = np.expand_dims(labels[ch2_pts[:,0],ch2_pts[:,1]],axis=1)
                         ch2_pts_int = np.expand_dims(ch2_stack[n][ch2_pts[:,0],ch2_pts[:,1]],axis=1)
