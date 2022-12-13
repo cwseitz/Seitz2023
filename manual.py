@@ -58,7 +58,7 @@ class Analyzer:
                 viewer.window.resize(2000, 1000)
                 viewer.add_image(ch0_stack[n],name='DAPI',colormap='blue',visible=False)
                 viewer.add_image(self.filter(ch1_stack[n]),name='GAPDH',colormap='green')
-                viewer.add_image(self.filter(ch2_stack[n]),name='GBP5',colormap='red',visible=False)
+                viewer.add_image(self.filter(ch2_stack[n]),name='GBP5',colormap='yellow',visible=False)
                 viewer.add_shapes(name='Nucleus')
                 viewer.add_shapes(name='Cytoplasm')
                 napari.run()
