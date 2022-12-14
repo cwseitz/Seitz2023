@@ -30,32 +30,44 @@ class Checker:
         return image
 
     def check(self):
- 
+
         ch0_stack = tifffile.imread(self.opath + self.pfx + self.sfx + 'ch0.tif')
         ch1_stack = tifffile.imread(self.opath + self.pfx + self.sfx + 'ch1.tif')
         ch2_stack = tifffile.imread(self.opath + self.pfx + self.sfx + 'ch2.tif')
-
         print('Loaded.')
-
         for n in range(ch0_stack.shape[0]):
             try:
-
-                df1 = pd.read_csv(self.opath + self.pfx + self.sfx + f'gapdh_{n}.csv')
-                df2 = pd.read_csv(self.opath + self.pfx + self.sfx + f'gbp5_{n}.csv')
                 mask1 = imread(self.opath + self.pfx + self.sfx + f'nuc_mask_{n}.tif')
                 mask2 = imread(self.opath + self.pfx + self.sfx + f'cyto_mask_{n}.tif')
+                df1 = pd.read_csv(self.opath + self.pfx + self.sfx + f'gapdh_{n}.csv',index_col=0)
+                df2 = pd.read_csv(self.opath + self.pfx + self.sfx + f'gbp5_{n}.csv',index_col=0) 
+
+                #df1 = df1.drop(['label','intensity'],errors='ignore')
+                #df1['label'] = mask2[df1['x'],df1['y']]
+                #df1['intensity'] = ch1_stack[n][df1['x'],df1['y']] 
+                #df2 = df2.drop(['label','intensity'],errors='ignore')
+                #df2['label'] = mask2[df2['x'],df2['y']]
+                #df2['intensity'] = ch2_stack[n][df2['x'],df2['y']]
+                #df1.to_csv(self.opath + self.pfx + self.sfx + f'gapdh_{n}.csv')
+                #df2.to_csv(self.opath + self.pfx + self.sfx + f'gbp5_{n}.csv')
+
+                df1 = df1.loc[df1['label'] != 0]
+                df2 = df2.loc[df2['label'] != 0]
+                vals, bins = np.histogram(df1['intensity'],bins=10)
                 print(f'Found all files for tile {n}') 
-                fig, ax = plt.subplots(figsize=(10,10)) 
+                fig, ax = plt.subplots(1,2,figsize=(8,6)) 
                 rgb = self.get_rgb(ch0_stack[n],3*self.filter(ch1_stack[n]),3*self.filter(ch2_stack[n]))
                 rgb = mark_boundaries(rgb,mask1,color=(0.8,0.8,0.8))
                 rgb = mark_boundaries(rgb,mask2,color=(0.8,0.8,0.8))
-                ax.imshow(rgb)
-                anno_blob(ax, df1, color='yellow')
-                anno_blob(ax, df2, color='red')
-                ax.set_xticks([])
-                ax.set_yticks([])
-                ax.legend()
+                ax[0].imshow(rgb)
+                anno_blob(ax[0], df1, color='yellow')
+                anno_blob(ax[0], df2, color='red')
+                ax[0].set_xticks([])
+                ax[0].set_yticks([])
+                ax[0].legend()
+                ax[1].plot(bins[:-1],vals,color='blue')
                 plt.tight_layout()
                 plt.show()
+
             except Exception as e:
-                print(f'Missing files for tile {n}') 
+               print(f'Missing files for tile {n}') 
