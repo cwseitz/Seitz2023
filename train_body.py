@@ -2,14 +2,14 @@ import argparse
 import collections
 import torch
 import numpy as np
-import arwn.data_loaders as data_loaders
-import arwn.train.loss as module_loss
-import arwn.train.metrics as module_metric
+import UNET.data_loaders as data_loaders
+import UNET.train.loss as module_loss
+import UNET.train.metrics as module_metric
 import matplotlib.pyplot as plt
-import arwn.torch_models as module_arch
-from arwn.utils import ConfigParser
-from arwn.utils import prepare_device
-from arwn.train import UNETTrainer
+import UNET.torch_models as module_arch
+from UNET.utils import ConfigParser
+from UNET.utils import prepare_device
+from UNET.train import UNETTrainer
 from torchsummary import summary
 torch.cuda.empty_cache()
 

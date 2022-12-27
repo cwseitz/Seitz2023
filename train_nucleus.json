@@ -28,7 +28,7 @@
 						"amsgrad": true
 				}
 		},
-		"loss": "WeightedCrossEntropyLoss",
+		"loss": "CrossEntropyLoss",
 		"metrics": ["BackgroundRecall",
 								"BoundaryRecall",
 								"InteriorRecall",
