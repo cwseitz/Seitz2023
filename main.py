@@ -1,8 +1,8 @@
 from tiler import Tiler
 from correct import Basic
-from manual import Analyzer
 from pathlib import Path
-from check import Checker
+from detect import Detector
+from mrf import MRFSegmenter
 
 path0 = '/research3/shared/cwseitz/Data/'
 
@@ -26,8 +26,8 @@ paths = [
 #'221206-Hela-IFNG-24h-1_1/',
 #'221206-Hela-IFNG-24h-3_1/',
 #'221206-Hela-IFNG-24h-4_1/'
-#'221218-Hela-IFNG-16h-2_1/'
-'221218-Hela-IFNG-4h-2_1/'
+'221218-Hela-IFNG-16h-2_1/'
+#'221218-Hela-IFNG-4h-2_1/'
 ]
 
 for i,path in enumerate(paths): 
@@ -47,8 +47,9 @@ for ipath in paths:
     tiler.tile()
     basic = Basic(opath,prefix)
     basic.correct()
-    #analyzer = Analyzer(prefix,opath)
-    #analyzer.analyze(n0=7)
-    #checker = Checker(prefix,opath)
-    #checker.check()
+    #detector = Detector(ipath,opath,prefix)
+    #detector.detect()
+    #mrf = MRFSegmenter(ipath,opath,prefix)
+    #mrf.segment()
+
 
