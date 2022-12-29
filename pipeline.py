@@ -3,6 +3,7 @@ from correct import Basic
 from detect import Detector
 from nucleus import NucleusModel
 from cellbody import CellBodyModel
+from summary import Summary
 from pathlib import Path
 
 class Pipeline:
@@ -12,14 +13,17 @@ class Pipeline:
         self.analpath = config['analpath']
         self.cmodelpath = config['cmodelpath']
         self.nmodelpath = config['nmodelpath']
+        self.cell_filters = config['cell_filters']
+        self.nucleus_filters = config['nucleus_filters']
         self.prefix = prefix
         Path(self.analpath+self.prefix).mkdir(parents=True, exist_ok=True)
     def execute(self):
-        self.tile()
-        self.basic_correct()
-        self.segment_nuclei()
-        self.segment_cells()
-        self.detect_spots()
+        pass
+        #self.tile()
+        #self.basic_correct()
+        #self.segment_nuclei()
+        #self.segment_cells()
+        #self.detect_spots()
     def tile(self):
         tiler = Tiler(self.datapath,self.analpath,self.prefix)
         tiler.tile()
@@ -33,7 +37,10 @@ class Pipeline:
         cmodel = CellBodyModel(self.cmodelpath,self.analpath,self.prefix)
         cmodel.segment()
     def detect_spots(self):
-        detector = Detector(self.datapath,self.prefix)
+        detector = Detector(self.datapath,self.analpath,self.prefix)
         detector.detect()
+    def summarize(self):
+        summary = Summary(self.datapath,self.analpath,self.prefix,self.cell_filters,self.nucleus_filters)
+        summary.summarize()
 
 

@@ -30,7 +30,8 @@ with open('config.json', 'r') as f:
 for prefix in prefixes:
     print("Processing " + prefix)
     pipe = Pipeline(config,prefix)
-    pipe.execute()
+    #pipe.execute()
+    pipe.summarize()
 
 
 
