@@ -1,13 +1,7 @@
-from tiler import Tiler
-from correct import Basic
-from pathlib import Path
-from detect import Detector
-from mrf import MRFSegmenter
+from pipeline import Pipeline
 
-path0 = '/research3/shared/cwseitz/Data/'
-
-paths = [
-#'221206-Hela-IFNG-1h-1_1/', #GAPDH channel is not very good
+prefixes = [
+#'221206-Hela-IFNG-1h-1_1/',
 #'221206-Hela-IFNG-1h-2_1/',
 #'221206-Hela-IFNG-1h-3_2/',
 #'221206-Hela-IFNG-1h-4_1/',
@@ -30,26 +24,12 @@ paths = [
 #'221218-Hela-IFNG-4h-2_1/'
 ]
 
-for i,path in enumerate(paths): 
-    paths[i] = path0+paths[i]
-
-def get_opath(ipath):
-    return ipath.replace('Data', 'Analysis')
-def get_prefix(ipath):
-    return ipath.split('/')[-2]
-
-for ipath in paths:
-    prefix = get_prefix(ipath)
+config = ConfigParser.from_args(args, options)
+for prefix in prefixes:
     print("Processing " + prefix)
-    opath = get_opath(ipath)
-    Path(opath).mkdir(parents=True, exist_ok=True)
-    tiler = Tiler(ipath,opath,prefix)
-    tiler.tile()
-    basic = Basic(opath,prefix)
-    basic.correct()
-    #detector = Detector(ipath,opath,prefix)
-    #detector.detect()
-    #mrf = MRFSegmenter(ipath,opath,prefix)
-    #mrf.segment()
+    Path(analpath+prefix).mkdir(parents=True, exist_ok=True)
+    pipe = Pipeline(config,prefix)
+    pipe.execute()
+
 
 

@@ -9,7 +9,7 @@ from skimage.segmentation import mark_boundaries
 from skimage.util import img_as_ubyte, img_as_uint
 import tifffile
 
-class Checker:
+class Summarize:
     def __init__(self,pfx,opath,sfx='_mxtiled_corrected_stack_'):
         self.pfx = pfx
         self.opath = opath
@@ -71,3 +71,33 @@ class Checker:
 
             except Exception as e:
                print(f'Missing files for tile {n}') 
+               
+               
+                       
+    def filter_objects(self,mask,min_area=5000,max_area=50000,max_ecc=0.75,min_solid=0.9):
+        props = ('label', 'area', 'eccentricity','solidity','centroid')
+        table = regionprops_table(mask,properties=props)
+        condition = (table['area'] > min_area) &\
+                    (table['area'] < max_area) &\
+                    (table['eccentricity'] < max_ecc) &\
+                    (table['solidity'] > min_solid)
+        input_labels = table['label']
+        output_labels = input_labels * condition
+        filtered_mask = map_array(mask, input_labels, output_labels)
+        filtered_table = regionprops_table(filtered_mask,properties=props)
+        return filtered_mask, filtered_table
+        
+    def plot_groups(self,ch1_blobs,mask):
+        palette = list(mcd.XKCD_COLORS.values())[::10]
+        fig, ax = plt.subplots()
+        groups = ch1_blobs['cluster1'].unique()
+        ax.imshow(mask,cmap='gray')
+        #for group in groups:
+        #    this_df = ch1_blobs.loc[ch1_blobs['cluster1'] == group]
+        #    X_group = this_df[['x','y']].to_numpy()
+        #    clustering = AgglomerativeClustering().fit(X_group)
+        #    ch1_blobs.loc[ch1_blobs['cluster1'] == group, 'cluster2'] = clustering.labels_
+        groups = ch1_blobs.groupby(['cluster1','cluster2'])
+        for i,(name, group) in enumerate(groups):
+            ax.scatter(group['y'],group['x'],marker='o',s=3,color=palette[i])
+        plt.show()

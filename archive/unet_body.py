@@ -20,7 +20,6 @@ from skimage.transform import resize
 from skimage.util import img_as_int
 from skimage.restoration import rolling_ball
 from skimage.io import imsave, imread
-from scipy.special import softmax
 torch.cuda.empty_cache()
 
 # fix random seeds for reproducibility
