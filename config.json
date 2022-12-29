@@ -1,8 +1,8 @@
 {
 	"datapath": "/research3/shared/cwseitz/Data/",
-	"analpath": "/research3/shared/cwseitz/Analysis/",
+	"analpath": "/research3/shared/cwseitz/Analysis/Auto/",
 	"cmodelpath": "/research3/shared/cwseitz/Models/CellBodyModel/",
 	"nmodelpath": "/research3/shared/cwseitz/Models/NucleusModel/",
-	"cell_filters": {"min_area":1e5,"max_area":2e5,"min_solid":0.8},
+	"cell_filters": {"min_area":1e5,"max_area":3e5,"min_solid":0.8},
 	"nucleus_filters": {"min_area":2e4,"max_area":4e4,"min_solid":0.8}
 }

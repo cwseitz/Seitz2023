@@ -18,12 +18,11 @@ class Pipeline:
         self.prefix = prefix
         Path(self.analpath+self.prefix).mkdir(parents=True, exist_ok=True)
     def execute(self):
-        pass
         #self.tile()
         #self.basic_correct()
         #self.segment_nuclei()
         #self.segment_cells()
-        #self.detect_spots()
+        self.detect_spots()
     def tile(self):
         tiler = Tiler(self.datapath,self.analpath,self.prefix)
         tiler.tile()
@@ -31,16 +30,16 @@ class Pipeline:
         basic = Basic(self.analpath,self.prefix)
         basic.correct()
     def segment_nuclei(self):
-        nmodel = NucleusModel(self.nmodelpath,self.analpath,self.prefix)
+        nmodel = NucleusModel(self.nmodelpath,self.analpath,self.prefix,self.nucleus_filters)
         nmodel.segment()
     def segment_cells(self):
-        cmodel = CellBodyModel(self.cmodelpath,self.analpath,self.prefix)
+        cmodel = CellBodyModel(self.cmodelpath,self.analpath,self.prefix,self.cell_filters)
         cmodel.segment()
     def detect_spots(self):
         detector = Detector(self.datapath,self.analpath,self.prefix)
         detector.detect()
     def summarize(self):
         summary = Summary(self.datapath,self.analpath,self.prefix,self.cell_filters,self.nucleus_filters)
-        summary.summarize()
+        #summary.summarize()
 
 

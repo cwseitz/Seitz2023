@@ -20,14 +20,13 @@ class Summary:
         self.z0 = z0
         self.cell_filters = cell_filters
         self.nucleus_filters = nucleus_filters
-        print(cell_filters,nucleus_filters)
         dataset = Dataset(self.datapath+self.prefix)
         self.rawdata = dataset.as_array(stitched=False,axes=['z','channel','row','column'])
         nz,nc,nt,_,nx,ny = self.rawdata.shape
         self.rawdata = self.rawdata.reshape((nz,nc,nt**2,nx,ny))
         self.rawdata = self.rawdata[:,:,:,:1844,:1844]
-        self.ch0_mask = tifffile.imread(self.analpath+self.prefix+'/'+self.prefix+'_ch0_mask.tif')
-        self.ch1_mask = tifffile.imread(self.analpath+self.prefix+'/'+self.prefix+'_ch1_mask.tif')
+        self.ch0_sfmx = np.load(self.analpath+self.prefix+'/'+self.prefix+'_ch0_softmax.npz')['arr_0']
+        self.ch1_sfmx = np.load(self.analpath+self.prefix+'/'+self.prefix+'_ch1_softmax.npz')['arr_0']
         self.ch1_spots = pd.read_csv(self.analpath+self.prefix+'/'+self.prefix+'_ch1_spots.csv')
         self.ch2_spots = pd.read_csv(self.analpath+self.prefix+'/'+self.prefix+'_ch2_spots.csv')
         print('Loaded.')
@@ -45,6 +44,40 @@ class Summary:
         ch1_spotst = ch1_spotst.assign(cell=ch1_spot_labels)
         ch2_spotst = ch2_spotst.assign(cell=ch2_spot_labels)
         return ch1_spotst, ch2_spotst
+    def plot_prob(self,output,image,mask,maskt_filtered):
+        output = F.softmax(output,dim=1)
+        fig,ax = plt.subplots(2,3,figsize=(8,4),sharex=True,sharey=True)
+        rgb = mark_boundaries(50*image,mask,mode='thick',color=(1,1,1))
+        im0 = ax[0,0].imshow(rgb,cmap='gray')
+        ax[0,0].set_title('Raw')
+        ax[0,0].set_xticks([]); ax[0,0].set_yticks([])
+        im0 = ax[0,1].imshow(mask,cmap='gray')
+        ax[0,1].set_xticks([]); ax[0,1].set_yticks([])
+        ax[0,1].set_title('Mask')
+        im0 = ax[0,2].imshow(maskt_filtered,cmap='gray')
+        ax[0,2].set_title('Filtered')
+        ax[0,2].set_xticks([]); ax[0,2].set_yticks([])
+        im1 = ax[1,0].imshow(output[0,0,:,:].numpy(),cmap='coolwarm')
+        ax[1,0].set_title('Background')
+        ax[1,0].set_xticks([]); ax[1,0].set_yticks([])
+        plt.colorbar(im1,ax=ax[1,0],label='Probability')
+        im2 = ax[1,1].imshow(output[0,1,:,:].numpy(),cmap='coolwarm')
+        ax[1,1].set_title('Interior')
+        ax[1,1].set_xticks([]); ax[1,1].set_yticks([])
+        plt.colorbar(im2,ax=ax[1,1],label='Probability')
+        im3 = ax[1,2].imshow(output[0,2,:,:].numpy(),cmap='coolwarm')
+        ax[1,2].set_xticks([]); ax[1,2].set_yticks([])
+        ax[1,2].set_title('Boundary')
+        plt.colorbar(im3,ax=ax[1,2],label='Probability')
+        plt.tight_layout()
+        plt.show() 
+    def get_mask(self,output):
+        output = F.softmax(output,dim=1)
+        nmask = np.zeros((256,256),dtype=np.bool)
+        nmask[output[0,1,:,:] > 0.95] = True
+        nmask = img_as_bool(nmask)
+        nmask = clear_border(nmask)
+        return nmask 
     def summarize(self):
         nz,nc,nt,nx,ny = self.rawdata.shape
         for n in range(nt):
@@ -77,7 +110,7 @@ class Summary:
             plt.show()
     
     def filter_objects(self,mask,min_area=5000,max_area=50000,min_solid=0.9):
-        props = ('label', 'area', 'eccentricity','solidity')
+        props = ('label', 'area', 'solidity')
         table = regionprops_table(mask,properties=props)
         condition = (table['area'] > min_area) &\
                     (table['area'] < max_area) &\
