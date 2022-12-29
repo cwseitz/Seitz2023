@@ -3,14 +3,16 @@ import pandas as pd
 import tifffile
 import matplotlib.pyplot as plt
 import matplotlib._color_data as mcd
+import torch.nn.functional as F
 from pycromanager import Dataset
 from skimage.restoration import rolling_ball
 from skimage.filters import gaussian
 from skimage.io import imread
 from smlm.plot import anno_blob
-from skimage.segmentation import mark_boundaries
-from skimage.util import img_as_ubyte, img_as_uint, map_array
-from skimage.measure import regionprops_table
+from skimage.segmentation import mark_boundaries, clear_border
+from skimage.transform import resize
+from skimage.util import img_as_ubyte, img_as_uint, map_array, img_as_bool
+from skimage.measure import regionprops_table, label
 
 class Summary:
     def __init__(self,datapath,analpath,prefix,cell_filters,nucleus_filters,z0=4):
@@ -44,8 +46,7 @@ class Summary:
         ch1_spotst = ch1_spotst.assign(cell=ch1_spot_labels)
         ch2_spotst = ch2_spotst.assign(cell=ch2_spot_labels)
         return ch1_spotst, ch2_spotst
-    def plot_prob(self,output,image,mask,maskt_filtered):
-        output = F.softmax(output,dim=1)
+    def plot_prob(self,sfmx,image,mask,maskt_filtered):
         fig,ax = plt.subplots(2,3,figsize=(8,4),sharex=True,sharey=True)
         rgb = mark_boundaries(50*image,mask,mode='thick',color=(1,1,1))
         im0 = ax[0,0].imshow(rgb,cmap='gray')
@@ -57,34 +58,42 @@ class Summary:
         im0 = ax[0,2].imshow(maskt_filtered,cmap='gray')
         ax[0,2].set_title('Filtered')
         ax[0,2].set_xticks([]); ax[0,2].set_yticks([])
-        im1 = ax[1,0].imshow(output[0,0,:,:].numpy(),cmap='coolwarm')
+        im1 = ax[1,0].imshow(sfmx[0,0,:,:],cmap='coolwarm')
         ax[1,0].set_title('Background')
         ax[1,0].set_xticks([]); ax[1,0].set_yticks([])
         plt.colorbar(im1,ax=ax[1,0],label='Probability')
-        im2 = ax[1,1].imshow(output[0,1,:,:].numpy(),cmap='coolwarm')
+        im2 = ax[1,1].imshow(sfmx[0,1,:,:],cmap='coolwarm')
         ax[1,1].set_title('Interior')
         ax[1,1].set_xticks([]); ax[1,1].set_yticks([])
         plt.colorbar(im2,ax=ax[1,1],label='Probability')
-        im3 = ax[1,2].imshow(output[0,2,:,:].numpy(),cmap='coolwarm')
+        im3 = ax[1,2].imshow(sfmx[0,2,:,:],cmap='coolwarm')
         ax[1,2].set_xticks([]); ax[1,2].set_yticks([])
         ax[1,2].set_title('Boundary')
         plt.colorbar(im3,ax=ax[1,2],label='Probability')
         plt.tight_layout()
-        plt.show() 
-    def get_mask(self,output):
-        output = F.softmax(output,dim=1)
+        plt.show()
+    def get_mask(self,sfmx):
         nmask = np.zeros((256,256),dtype=np.bool)
-        nmask[output[0,1,:,:] > 0.95] = True
+        nmask[sfmx[1,:,:] > 0.95] = True
         nmask = img_as_bool(nmask)
         nmask = clear_border(nmask)
         return nmask 
     def summarize(self):
         nz,nc,nt,nx,ny = self.rawdata.shape
         for n in range(nt):
+            ch0 = resize(self.rawdata[self.z0,0,n,:,:],(256,256))
+            ch1 = resize(self.rawdata[self.z0,1,n,:,:],(256,256))
+            ch0_mask = self.get_mask(self.ch0_sfmx[n])
+            ch1_mask = self.get_mask(self.ch1_sfmx[n])
+            self.plot_prob(self.ch0_sfmx,ch0,ch0_mask,ch0_mask)
+            self.plot_prob(self.ch1_sfmx,ch1,ch1_mask,ch1_mask)
+            ch0_mask = img_as_bool(resize(ch0_mask,(1844,1844)))
+            ch1_mask = img_as_bool(resize(ch1_mask,(1844,1844)))
+            ch0_mask = label(ch0_mask); ch1_mask = label(ch1_mask)
             ch1_spotst = self.ch1_spots.loc[self.ch1_spots['tile'] == n]
             ch2_spotst = self.ch2_spots.loc[self.ch2_spots['tile'] == n]
-            ch0_mask_filtered = self.filter_objects(self.ch0_mask[n],**self.nucleus_filters)
-            ch1_mask_filtered = self.filter_objects(self.ch1_mask[n],**self.cell_filters)
+            ch0_mask_filtered = self.filter_objects(ch0_mask,**self.nucleus_filters)
+            ch1_mask_filtered = self.filter_objects(ch1_mask,**self.cell_filters)
             ch0_mask_filtered[ch0_mask_filtered > 0] = 1
             ch0_mask_filtered = ch0_mask_filtered*ch1_mask_filtered
             ch1_spotst = ch1_spotst.loc[ch1_spotst['x'].between(1,1843)]
@@ -103,8 +112,7 @@ class Summary:
             ax.imshow(rgb)
             anno_blob(ax,ch1_spotst,color='cyan')
             anno_blob(ax,ch2_spotst,color='yellow')
-            ax.set_xticks([])
-            ax.set_yticks([])
+            ax.set_xticks([]); ax.set_yticks([])
             plt.tight_layout()
             plt.savefig(self.analpath+self.prefix+'/'+self.prefix+'_summary.png')
             plt.show()

@@ -18,10 +18,10 @@ class Pipeline:
         self.prefix = prefix
         Path(self.analpath+self.prefix).mkdir(parents=True, exist_ok=True)
     def execute(self):
-        #self.tile()
-        #self.basic_correct()
-        #self.segment_nuclei()
-        #self.segment_cells()
+        self.tile()
+        self.basic_correct()
+        self.segment_nuclei()
+        self.segment_cells()
         self.detect_spots()
     def tile(self):
         tiler = Tiler(self.datapath,self.analpath,self.prefix)
@@ -40,6 +40,6 @@ class Pipeline:
         detector.detect()
     def summarize(self):
         summary = Summary(self.datapath,self.analpath,self.prefix,self.cell_filters,self.nucleus_filters)
-        #summary.summarize()
+        summary.summarize()
 
 

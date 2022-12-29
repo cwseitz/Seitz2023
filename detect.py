@@ -13,7 +13,7 @@ class Detector:
         self.datapath = datapath
         self.analpath = analpath
         self.prefix = prefix
-    def detect(self,ch1_thres=0.0003,ch2_thres=0.000175,z0=4):
+    def detect(self,ch1_thres=0.0003,ch2_thres=0.000175,z0=5):
         dataset = Dataset(self.datapath+self.prefix)
         X = dataset.as_array(stitched=False,axes=['z','channel','row','column'])
         nz,nc,nt,_,nx,ny = X.shape
