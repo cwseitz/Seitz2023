@@ -1,11 +1,4 @@
 {
-	"arch": {
-			"type": "UNetModel",
-			"args": {
-					"n_channels": 1,
-					"n_classes": 3
-	             }			
-		},
 	"datapath": "/research3/shared/cwseitz/Data/",
 	"analpath": "/research3/shared/cwseitz/Analysis/",
 	"cmodelpath": "/research3/shared/cwseitz/Models/CellBodyModel/",
