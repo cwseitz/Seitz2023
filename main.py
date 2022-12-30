@@ -14,7 +14,7 @@ for prefix in prefixes:
     print("Processing " + prefix)
     pipe = Pipeline(config,prefix)
     #pipe.execute()
-    pipe.summarize()
+    pipe.segment_cells()
 
 
 

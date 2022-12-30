@@ -1,9 +1,9 @@
 from tiler import Tiler
 from correct import Basic
 from detect import Detector
-from nucleus import NucleusModel
-from cellbody import CellBodyModel
-from summary import Summary
+#from nucleus_model import NucleusModel
+#from cell_model import CellBodyModel
+from segment import CellSegmenter
 from pathlib import Path
 
 class Pipeline:
@@ -15,13 +15,14 @@ class Pipeline:
         self.nmodelpath = config['nmodelpath']
         self.cell_filters = config['cell_filters']
         self.nucleus_filters = config['nucleus_filters']
+        self.p0 = config['p0']
         self.prefix = prefix
         Path(self.analpath+self.prefix).mkdir(parents=True, exist_ok=True)
     def execute(self):
         self.tile()
         self.basic_correct()
-        self.segment_nuclei()
-        self.segment_cells()
+        self.apply_nucleus_model()
+        self.apply_cell_model()
         self.detect_spots()
     def tile(self):
         tiler = Tiler(self.datapath,self.analpath,self.prefix)
@@ -29,17 +30,17 @@ class Pipeline:
     def basic_correct(self):
         basic = Basic(self.analpath,self.prefix)
         basic.correct()
-    def segment_nuclei(self):
+    def apply_nucleus_model(self):
         nmodel = NucleusModel(self.nmodelpath,self.analpath,self.prefix,self.nucleus_filters)
-        nmodel.segment()
-    def segment_cells(self):
+        nmodel.apply()
+    def apply_cell_model(self):
         cmodel = CellBodyModel(self.cmodelpath,self.analpath,self.prefix,self.cell_filters)
-        cmodel.segment()
+        cmodel.apply()
     def detect_spots(self):
         detector = Detector(self.datapath,self.analpath,self.prefix)
         detector.detect()
-    def summarize(self):
-        summary = Summary(self.datapath,self.analpath,self.prefix,self.cell_filters,self.nucleus_filters)
-        summary.summarize()
+    def segment_cells(self):
+        cellsegment = CellSegmenter(self.datapath,self.analpath,self.prefix,self.cell_filters,self.p0)
+        cellsegment.segment()
 
 
