@@ -15,6 +15,8 @@ class Pipeline:
         self.nmodelpath = config['nmodelpath']
         self.cell_filters = config['cell_filters']
         self.nucleus_filters = config['nucleus_filters']
+        self.ch1_thresh = config['ch1_thresh']
+        self.ch2_thresh = config['ch2_thresh']
         self.p0 = config['p0']
         self.prefix = prefix
         Path(self.analpath+self.prefix).mkdir(parents=True, exist_ok=True)
@@ -24,23 +26,54 @@ class Pipeline:
         self.apply_nucleus_model()
         self.apply_cell_model()
         self.detect_spots()
+        self.segment_cells()
     def tile(self):
-        tiler = Tiler(self.datapath,self.analpath,self.prefix)
-        tiler.tile()
+        file = Path(self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_ch0.tif')
+        if not file.exists():
+            print('Tiling raw data...')
+            tiler = Tiler(self.datapath,self.analpath,self.prefix)
+            tiler.tile()
+        else:
+            print('Tiled data exists. Skipping')
     def basic_correct(self):
-        basic = Basic(self.analpath,self.prefix)
-        basic.correct()
+        file = Path(self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_corrected_ch0.tif')
+        if not file.exists():
+            print('Applying basic correction...')
+            basic = Basic(self.analpath,self.prefix)
+            basic.correct()
+        else:
+            print('Corrected files exists. Skipping')
     def apply_nucleus_model(self):
-        nmodel = NucleusModel(self.nmodelpath,self.analpath,self.prefix,self.nucleus_filters)
-        nmodel.apply()
+        file = Path(self.analpath+self.prefix+'/'+self.prefix+'_ch0_softmax.npz')
+        if not file.exists():
+            print('Applying nucleus model...')
+            nmodel = NucleusModel(self.nmodelpath,self.analpath,self.prefix,self.nucleus_filters)
+            nmodel.apply()
+        else:
+            print('Nucleus softmax files exist. Skipping')
     def apply_cell_model(self):
-        cmodel = CellBodyModel(self.cmodelpath,self.analpath,self.prefix,self.cell_filters)
-        cmodel.apply()
+        file = Path(self.analpath+self.prefix+'/'+self.prefix+'_ch1_softmax.npz')
+        if not file.exists():
+            print('Applying cell model...')
+            cmodel = CellBodyModel(self.cmodelpath,self.analpath,self.prefix,self.cell_filters)
+            cmodel.apply()
+        else:
+            print('Cell softmax files exist. Skipping')
     def detect_spots(self):
-        detector = Detector(self.datapath,self.analpath,self.prefix)
-        detector.detect()
+        file = Path(self.analpath+self.prefix+'/'+self.prefix+'_ch1_spots.csv')
+        if not file.exists():
+            print('Running spot detection...')
+            detector = Detector(self.datapath,self.analpath,self.prefix,self.ch1_thresh,self.ch2_thresh)
+            detector.detect()
+        else:
+            print('Spot files exist. Skipping')
     def segment_cells(self):
-        cellsegment = CellSegmenter(self.datapath,self.analpath,self.prefix,self.cell_filters,self.p0)
-        cellsegment.segment()
+        file = Path(self.analpath+self.prefix+'/'+self.prefix+'_ch1_mask0.tif')
+        if not file.exists():
+            print('Running cell segmentation...')
+            cellsegment = CellSegmenter(self.datapath,self.analpath,self.prefix,self.cell_filters,self.p0)
+            cellsegment.segment()
+        else:
+            print('Mask files exist. Skipping')
 
 
