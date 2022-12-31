@@ -77,11 +77,6 @@ class Pipeline:
         else:
             print('Mask files exist. Skipping')
     def spot_counts(self):
-        file = Path(self.analpath+self.prefix+'/'+self.prefix+'_ch1_counts.csv')
-        if not file.exists():
-            print('Assigning spots to cells...')
-            sc = SpotCounts(self.datapath,self.analpath,self.prefix)
-            sc.count()
-        else:
-            print('Spot count files exist. Skipping')       
+        sc = SpotCounts(self.datapath,self.analpath,self.prefix)
+        sc.count()      
 

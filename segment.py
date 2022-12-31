@@ -147,19 +147,21 @@ class SpotCounts:
     def count(self,plot=False):
         nz,nc,nt,nx,ny = self.rawdata.shape
         self.ch1_spots, self.ch2_spots =\
-        self.assign_spots_to_cells(ch1_spots,ch2_spots,self.ch1_mask)
-            #if plot:
-                #fig, ax = plt.subplots(1,2,figsize=(12,6)) 
-                #ch1 = np.max(self.rawdata[:,1,n,:,:],axis=0)
-                #ch2 = np.max(self.rawdata[:,2,n,:,:],axis=0)
-                #ch1 = mark_boundaries(ch1,mask,mode='thick',color=(1,1,1))
-                #ch2 = mark_boundaries(ch2,mask,mode='thick',color=(1,1,1))
-                #ax[0].imshow(50*ch1)
-                #ax[1].imshow(100*ch2)
-                #anno_blob(ax[0],ch1_spotst,color='cyan')
-                #anno_blob(ax[1],ch2_spotst,color='yellow')
-                #ax[0].set_xticks([]); ax[0].set_yticks([])
-                #ax[1].set_xticks([]); ax[1].set_yticks([])
-                #plt.tight_layout()
-                #plt.show()
+        self.assign_spots_to_cells(self.ch1_spots,self.ch2_spots,self.ch1_mask)
+        self.ch1_spots.to_csv(self.analpath+self.prefix+'/'+self.prefix+'_ch1_spots.csv')
+        self.ch2_spots.to_csv(self.analpath+self.prefix+'/'+self.prefix+'_ch2_spots.csv')
+        if plot:
+            fig, ax = plt.subplots(1,2,figsize=(12,6)) 
+            ch1 = np.max(self.rawdata[:,1,n,:,:],axis=0)
+            ch2 = np.max(self.rawdata[:,2,n,:,:],axis=0)
+            ch1 = mark_boundaries(ch1,mask,mode='thick',color=(1,1,1))
+            ch2 = mark_boundaries(ch2,mask,mode='thick',color=(1,1,1))
+            ax[0].imshow(50*ch1)
+            ax[1].imshow(100*ch2)
+            anno_blob(ax[0],ch1_spotst,color='cyan')
+            anno_blob(ax[1],ch2_spotst,color='yellow')
+            ax[0].set_xticks([]); ax[0].set_yticks([])
+            ax[1].set_xticks([]); ax[1].set_yticks([])
+            plt.tight_layout()
+            plt.show()
     
