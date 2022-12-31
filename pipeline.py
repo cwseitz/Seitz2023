@@ -3,7 +3,7 @@ from correct import Basic
 from detect import Detector
 #from nucleus_model import NucleusModel
 #from cell_model import CellBodyModel
-from segment import CellSegmenter
+from segment import CellSegmenter, SpotCounts
 from pathlib import Path
 
 class Pipeline:
@@ -27,6 +27,7 @@ class Pipeline:
         self.apply_cell_model()
         self.detect_spots()
         self.segment_cells()
+        self.spot_counts()
     def tile(self):
         file = Path(self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_ch0.tif')
         if not file.exists():
@@ -68,12 +69,19 @@ class Pipeline:
         else:
             print('Spot files exist. Skipping')
     def segment_cells(self):
-        file = Path(self.analpath+self.prefix+'/'+self.prefix+'_ch1_mask0.tif')
+        file = Path(self.analpath+self.prefix+'/'+self.prefix+'_ch1_mask.tif')
         if not file.exists():
             print('Running cell segmentation...')
             cellsegment = CellSegmenter(self.datapath,self.analpath,self.prefix,self.cell_filters,self.p0)
             cellsegment.segment()
         else:
             print('Mask files exist. Skipping')
-
+    def spot_counts(self):
+        file = Path(self.analpath+self.prefix+'/'+self.prefix+'_ch1_counts.csv')
+        if not file.exists():
+            print('Assigning spots to cells...')
+            sc = SpotCounts(self.datapath,self.analpath,self.prefix)
+            sc.count()
+        else:
+            print('Spot count files exist. Skipping')       
 

@@ -22,6 +22,7 @@ class Detector:
         X = dataset.as_array(stitched=False,axes=['z','channel','row','column'])
         nz,nc,nt,_,nx,ny = X.shape
         X = X.reshape((nz,nc,nt**2,nx,ny))
+        X = X[:,:,:,:1844,:1844]
         ch1_blobs = pd.DataFrame()
         ch2_blobs = pd.DataFrame()
         for n in range(nt**2):
