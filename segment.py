@@ -68,7 +68,7 @@ class CellSegmenter:
         nmask[nmask > 0] = 1
         nmask = img_as_bool(nmask)
         return nmask 
-    def segment(self,correct=False):
+    def segment(self,correct=True):
         nz,nc,nt,nx,ny = self.rawdata.shape
         label_stack = np.zeros((nt,nx,ny),dtype=np.int16)
         for n in range(nt):
@@ -85,14 +85,20 @@ class CellSegmenter:
                 viewer.add_image(ch1_mask,name='Prefilter',colormap='gray',visible=True,opacity=0.1)
                 contours = find_contours(ch1_mask_filtered)
                 contours = [contour[::10] for contour in contours]
-                viewer.add_shapes(contours, shape_type='polygon', edge_width=5,
+                if len(contours) > 0:
+                    viewer.add_shapes(contours, shape_type='polygon', edge_width=5,
                               edge_color='red', face_color='white', opacity=0.3, name='UNET')
-                napari.run()
-                labels = viewer.layers['UNET'].to_labels(labels_shape=ch1_mask.shape)
-                labels = label(labels).astype(np.uint16)
+                    napari.run()
+                    labels = viewer.layers['UNET'].to_labels(labels_shape=ch1_mask.shape)
+                    labels = label(labels).astype(np.uint16)
+                    label_stack[n] = labels
+                    imsave(self.analpath+self.prefix+'/'+self.prefix+f'_ch1_mask{n}.tif',labels)
+                else:
+                    print('No objects in tile..')
             else:
                 labels = label(ch1_mask_filtered).astype(np.uint16)
-            label_stack[n] = labels
+                label_stack[n] = labels
+                imsave(self.analpath+self.prefix+'/'+self.prefix+f'_ch1_mask{n}.tif',labels)
         imsave(self.analpath+self.prefix+'/'+self.prefix+f'_ch1_mask.tif',label_stack)
     def filter_objects(self,mask,min_area=None,max_area=None,min_solid=None):
         mask = label(mask)
@@ -117,51 +123,4 @@ class CellSegmenter:
             ax.scatter(group['y'],group['x'],marker='o',s=3,color=palette[i])
         plt.show()
         
-class SpotCounts:
-    def __init__(self,datapath,analpath,prefix,z0=4):
-        self.datapath = datapath
-        self.analpath = analpath
-        self.prefix = prefix
-        dataset = Dataset(self.datapath+self.prefix)
-        self.rawdata = dataset.as_array(stitched=False,axes=['z','channel','row','column'])
-        nz,nc,nt,_,nx,ny = self.rawdata.shape
-        self.rawdata = self.rawdata.reshape((nz,nc,nt**2,nx,ny))
-        self.rawdata = self.rawdata[:,:,:,:1844,:1844]
-        self.ch1_spots = pd.read_csv(self.analpath+self.prefix+'/'+self.prefix+'_ch1_spots.csv')
-        self.ch2_spots = pd.read_csv(self.analpath+self.prefix+'/'+self.prefix+'_ch2_spots.csv')
-        self.ch1_mask = imread(self.analpath+self.prefix+'/'+self.prefix+'_ch1_mask.tif')
-    def assign_spots_to_cells(self,ch1_spots,ch2_spots,mask):
-        ch1_idx = np.round(ch1_spots[['x','y','tile']].to_numpy()).astype(np.int16)
-        ch2_idx = np.round(ch2_spots[['x','y','tile']].to_numpy()).astype(np.int16)
-        ch1_spot_labels = mask[ch1_idx[:,2],ch1_idx[:,0],ch1_idx[:,1]]
-        ch2_spot_labels = mask[ch2_idx[:,2],ch2_idx[:,0],ch2_idx[:,1]]
-        ch1_spots = ch1_spots.assign(cell=ch1_spot_labels)
-        ch2_spots = ch2_spots.assign(cell=ch2_spot_labels)
-        return ch1_spots, ch2_spots
-    def get_rgb(self,ch0,ch1,ch2):
-        ch0_max = ch0.max()
-        ch1_max = ch1.max()
-        ch2_max = ch2.max()
-        rgb = np.dstack((ch2/ch2_max,ch1/ch1_max,ch0/ch0_max))
-        return rgb
-    def count(self,plot=False):
-        nz,nc,nt,nx,ny = self.rawdata.shape
-        self.ch1_spots, self.ch2_spots =\
-        self.assign_spots_to_cells(self.ch1_spots,self.ch2_spots,self.ch1_mask)
-        self.ch1_spots.to_csv(self.analpath+self.prefix+'/'+self.prefix+'_ch1_spots.csv')
-        self.ch2_spots.to_csv(self.analpath+self.prefix+'/'+self.prefix+'_ch2_spots.csv')
-        if plot:
-            fig, ax = plt.subplots(1,2,figsize=(12,6)) 
-            ch1 = np.max(self.rawdata[:,1,n,:,:],axis=0)
-            ch2 = np.max(self.rawdata[:,2,n,:,:],axis=0)
-            ch1 = mark_boundaries(ch1,mask,mode='thick',color=(1,1,1))
-            ch2 = mark_boundaries(ch2,mask,mode='thick',color=(1,1,1))
-            ax[0].imshow(50*ch1)
-            ax[1].imshow(100*ch2)
-            anno_blob(ax[0],ch1_spotst,color='cyan')
-            anno_blob(ax[1],ch2_spotst,color='yellow')
-            ax[0].set_xticks([]); ax[0].set_yticks([])
-            ax[1].set_xticks([]); ax[1].set_yticks([])
-            plt.tight_layout()
-            plt.show()
-    
+

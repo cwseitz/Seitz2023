@@ -3,7 +3,7 @@ from correct import Basic
 from detect import Detector
 #from nucleus_model import NucleusModel
 #from cell_model import CellBodyModel
-from segment import CellSegmenter, SpotCounts
+from segment import CellSegmenter
 from pathlib import Path
 
 class Pipeline:
@@ -76,7 +76,5 @@ class Pipeline:
             cellsegment.segment()
         else:
             print('Mask files exist. Skipping')
-    def spot_counts(self):
-        sc = SpotCounts(self.datapath,self.analpath,self.prefix)
-        sc.count()      
+  
 
