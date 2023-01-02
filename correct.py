@@ -15,13 +15,28 @@ class Basic:
         return (arr.reshape(h//nrows, nrows, -1, ncols)
                    .swapaxes(1,2)
                    .reshape(-1, nrows, ncols))
-    def correct(self):
+    def plot(self,basic):
+        fig, axes = plt.subplots(1, 3, figsize=(9, 3))
+        im = axes[0].imshow(basic.flatfield)
+        fig.colorbar(im, ax=axes[0])
+        axes[0].set_title("Flatfield")
+        im = axes[1].imshow(basic.darkfield)
+        fig.colorbar(im, ax=axes[1])
+        axes[1].set_title("Darkfield")
+        axes[2].plot(basic.baseline)
+        axes[2].set_xlabel("Frame")
+        axes[2].set_ylabel("Baseline")
+        fig.tight_layout()
+        plt.show()
+    def correct(self,plot=True):
         nt,nx,ny = 10,1844,1844
         path = self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_ch0.tif'
         ch0 = tifffile.imread(path)
         ch0_blocks = self.blockshaped(ch0,1844,1844)
         basic = BaSiC(get_darkfield=True)
         basic.fit(ch0_blocks)
+        if plot:
+            self.plot(basic)
         ch0_correct = basic.transform(ch0_blocks)
         ch0_correct = ch0_correct.astype(np.uint16)
         path = self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_corrected_stack_ch0.tif'
@@ -38,6 +53,8 @@ class Basic:
         ch1_blocks = self.blockshaped(ch1,1844,1844)
         basic = BaSiC(get_darkfield=True)
         basic.fit(ch1_blocks)
+        if plot:
+            self.plot(basic)
         ch1_correct = basic.transform(ch1_blocks)
         ch1_correct = ch1_correct.astype(np.uint16)
         path = self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_corrected_stack_ch1.tif'
@@ -54,6 +71,8 @@ class Basic:
         ch2_blocks = self.blockshaped(ch2,1844,1844)
         basic = BaSiC(get_darkfield=True)
         basic.fit(ch2_blocks)
+        if plot: 
+            self.plot(basic)
         ch2_correct = basic.transform(ch2_blocks)
         ch2_correct = ch2_correct.astype(np.uint16)
         path = self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_corrected_stack_ch2.tif'
@@ -63,3 +82,4 @@ class Basic:
         ch2_correct = ch2_correct.reshape((nt*nx,nt*ny))
         ch2_correct = ch2_correct.astype(np.uint16)
         path = self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_corrected_ch2.tif'
+        tifffile.imwrite(path,ch2_correct)

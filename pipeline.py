@@ -20,7 +20,7 @@ class Pipeline:
         self.p0 = config['p0']
         self.prefix = prefix
         Path(self.analpath+self.prefix).mkdir(parents=True, exist_ok=True)
-    def execute(self):
+    def sequential(self):
         self.tile()
         self.basic_correct()
         self.apply_nucleus_model()
