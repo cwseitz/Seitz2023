@@ -14,18 +14,8 @@ prefixes = [
 
 with open('config.json', 'r') as f:
     config = json.load(f)
-    
-#for prefix in prefixes:
-    #print("Processing " + prefix)
-    #pipe = Pipeline(config,prefix)
-    #pipe.tile()
-    #pipe.basic_correct()
-    #pipe.apply_nucleus_model()
-    #pipe.apply_cell_model()
-    #pipe.detect_spots()
-    #pipe.segment_cells()
 
-counts = [] #time, cell, gene
+counts = []
 for prefix in prefixes:
     sc = SpotCounts(config['datapath'],config['analpath'],prefix)
     count_matrix = sc.count_matrix(plot=False,z=5)
