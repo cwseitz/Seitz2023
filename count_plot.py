@@ -7,8 +7,8 @@ import json
 
 prefixes = [
 '221130-Hela-IFNG-2h-1_1',
-#'221218-Hela-IFNG-4h-1_1',
-'221130-Hela-IFNG-8h-1_1',
+'221218-Hela-IFNG-4h-1_1',
+#'221130-Hela-IFNG-8h-1_1',
 '221218-Hela-IFNG-16h-2_1',
 ]
 
@@ -38,7 +38,7 @@ ax[1,0].set_xlabel('mRNA Counts')
 ax[1,0].set_ylabel('Number of cells')
 ax[1,0].legend()
 ax[0,1].hist(counts[1][:,0],bins=ch1_bins,density=False,color='black',label='GAPDH')
-ax[0,1].set_title(f'8h (N={counts[1].shape[0]})')
+ax[0,1].set_title(f'4h (N={counts[1].shape[0]})')
 ax[0,1].legend()
 ax[1,1].hist(counts[1][:,1],bins=ch2_bins,density=False,color='blue',label='GBP5')
 ax[1,1].set_xlabel('mRNA Counts')
@@ -49,7 +49,7 @@ ax[0,2].legend()
 ax[1,2].hist(counts[2][:,1],bins=ch2_bins,density=False,color='blue',label='GBP5')
 ax[1,2].set_xlabel('mRNA Counts')
 ax[1,2].legend()
-ax[1,1].set_xlim([0,1])
+#ax[1,1].set_xlim([0,1])
 plt.tight_layout()
 plt.show()
 
