@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import tifffile
 import napari
+import uuid
 import matplotlib.pyplot as plt
 import matplotlib._color_data as mcd
 from pycromanager import Dataset
@@ -40,10 +41,10 @@ class SpotCounts:
         ch2_idx = np.round(ch2_spots[['x','y','tile']].to_numpy()).astype(np.int16)
         ch1_spot_labels = mask[ch1_idx[:,2],ch1_idx[:,0],ch1_idx[:,1]]
         ch2_spot_labels = mask[ch2_idx[:,2],ch2_idx[:,0],ch2_idx[:,1]]
-        ch1_spots = ch1_spots.assign(cell=ch1_spot_labels)
-        ch1_spots = ch1_spots.loc[ch1_spots['cell'] != 0]
-        ch2_spots = ch2_spots.assign(cell=ch2_spot_labels)
-        ch2_spots = ch2_spots.loc[ch2_spots['cell'] != 0]
+        ch1_spots = ch1_spots.assign(label=ch1_spot_labels)
+        ch1_spots = ch1_spots.loc[ch1_spots['label'] != 0]
+        ch2_spots = ch2_spots.assign(label=ch2_spot_labels)
+        ch2_spots = ch2_spots.loc[ch2_spots['label'] != 0]
         return ch1_spots, ch2_spots
     def get_rgb(self,ch0,ch1,ch2):
         ch0_max = ch0.max()
@@ -80,6 +81,9 @@ class SpotCounts:
                 ax[1,m].set_xticks([]); ax[1,m].set_yticks([])
             plt.tight_layout()
             plt.show()
+    def map_to_uuid(self,ngroups):
+        uuids = np.array([str(uuid.uuid4()) for _ in range(ngroups)])
+        return uuids
     def count_matrix(self,plot=False,z=None):
         self.ch1_spots, self.ch2_spots = self.count()
         self.ch1_spots, self.ch2_spots = self.filter_spots(self.ch1_spots,self.ch2_spots,z=z)
@@ -88,13 +92,20 @@ class SpotCounts:
         self.ch1_spots = self.ch1_spots.assign(gene='gapdh')
         self.ch2_spots = self.ch2_spots.assign(gene='gbp5')
         spots = pd.concat([self.ch1_spots,self.ch2_spots])
-        grouped = spots.groupby(['tile','cell'])
-        ncells = grouped.ngroups
-        count_mat = np.zeros((ncells,2))
+        grouped = spots.groupby(['tile','label'])
+        ngrps = grouped.ngroup().nunique()
+        uuids = self.map_to_uuid(ngrps)
+        spots['cell_id'] = uuids[grouped.ngroup()]
+        count_mat = pd.DataFrame([])
         for i,(name, group) in enumerate(grouped):
-            count_mat[i,0] = len(group.loc[group['gene'] == 'gapdh'])
-            count_mat[i,1] = len(group.loc[group['gene'] == 'gbp5'])
-        return count_mat            
+            ngpdh = len(group.loc[group['gene'] == 'gapdh'])
+            ngbp5 = len(group.loc[group['gene'] == 'gbp5'])
+            cell_id = group['cell_id'].unique()[0]
+            dict = {'gapdh': ngpdh, 'gbp5': ngbp5, 'cell_id': cell_id}
+            count_mat = count_mat.append(dict, ignore_index=True)
+        count_mat = count_mat.assign(grid=self.prefix)
+        spots = spots.assign(grid=self.prefix)
+        return spots, count_mat           
     def count(self):
         print(f'Counting spots in {self.prefix}')
         nz,nc,nt,nx,ny = self.rawdata.shape
