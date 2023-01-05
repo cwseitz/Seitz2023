@@ -6,6 +6,6 @@
 	"cell_filters": {"min_area":0.5e5,"max_area":1e10,"min_solid":0},
 	"nucleus_filters": {"min_area":2e4,"max_area":4e4,"min_solid":0.8},
 	"p0": 0.975,
-	"ch1_thresh":0.000175,
-	"ch2_thresh":0.000075
+	"ch1_thresh":0.0004,
+	"ch2_thresh":0.00025
 }

@@ -60,12 +60,12 @@ class Pipeline:
             cmodel.apply()
         else:
             print('Cell softmax files exist. Skipping')
-    def detect_spots(self):
+    def detect_spots(self,plot=False):
         file = Path(self.analpath+self.prefix+'/'+self.prefix+'_ch1_spots.csv')
         if not file.exists():
             print('Running spot detection...')
             detector = Detector(self.datapath,self.analpath,self.prefix,self.ch1_thresh,self.ch2_thresh)
-            detector.detect()
+            detector.detect(plot=plot)
         else:
             print('Spot files exist. Skipping')
     def segment_cells(self):

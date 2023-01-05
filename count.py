@@ -52,41 +52,39 @@ class SpotCounts:
         ch2_max = ch2.max()
         rgb = np.dstack((ch2/ch2_max,ch1/ch1_max,ch0/ch0_max))
         return rgb
-    def filter_spots(self,ch1_spots,ch2_spots,z=None):
-        ch1_avg = ch1_spots['peak'].mean()
-        ch2_avg = ch2_spots['peak'].mean()
-        ch1_spots = ch1_spots.loc[ch1_spots['peak'] > 0.003]
-        ch2_spots = ch2_spots.loc[ch2_spots['peak'] > 0.0015]
-        if z is not None:
-            ch1_spots = ch1_spots.loc[ch1_spots['z'] == z]
-            #ch2_spots = ch2_spots.loc[ch2_spots['z'] == z]
+    def filter_spots(self,ch1_spots,ch2_spots):
+        ch1_int_thres = 300
+        ch2_int_thres = 100
+        ch1_spots = ch1_spots.loc[ch1_spots['peak'] > ch1_int_thres]
+        ch2_spots = ch2_spots.loc[ch2_spots['peak'] > ch2_int_thres]
         return ch1_spots, ch2_spots
-    def plot_spots(self,ch1_spots,ch2_spots):
-        ch1_spots, ch2_spots = self.filter_spots(ch1_spots,ch2_spots)
+    def plot_spots(self,ch1_spots,ch2_spots,randomize=True):
+        #ch1_spots, ch2_spots = self.filter_spots(ch1_spots,ch2_spots)
         nz,nc,nt,nx,ny = self.rawdata.shape
-        zs = ch1_spots['z'].unique()
-        for n in range(nt):
-            fig, ax = plt.subplots(2,len(zs),figsize=(12,6),sharex=True,sharey=True) 
+        narray = np.arange(0,nt)
+        if randomize:
+            np.random.shuffle(narray)
+        for n in narray:
+            print(f'Plotting spots in tile {n}')
+            fig, ax = plt.subplots(1,2,figsize=(9,6),sharex=True,sharey=True) 
             ch1_spotst = ch1_spots.loc[ch1_spots['tile'] == n]
             ch2_spotst = ch2_spots.loc[ch2_spots['tile'] == n]
-            for m,z in enumerate(zs):
-                ch1_spotstz =  ch1_spotst.loc[ch1_spotst['z'] == z]
-                ch2_spotstz =  ch2_spotst.loc[ch2_spotst['z'] == z]
-                ch1 = gaussian(self.rawdata[z,1,n,:,:],sigma=1)
-                ch2 = gaussian(self.rawdata[z,2,n,:,:],sigma=1)
-                ax[0,m].imshow(ch1,cmap='gray'); ax[1,m].imshow(ch2,cmap='gray')
-                anno_blob(ax[0,m],ch1_spotstz,color='cyan')
-                anno_blob(ax[1,m],ch2_spotstz,color='yellow')
-                ax[0,m].set_xticks([]); ax[0,m].set_yticks([])
-                ax[1,m].set_xticks([]); ax[1,m].set_yticks([])
+            ch1 = np.max(self.rawdata[:,1,n,:,:],axis=0)
+            ch2 = np.max(self.rawdata[:,2,n,:,:],axis=0)
+            ax[0].imshow(ch1,cmap='gray')
+            ax[1].imshow(100*ch2,cmap='gray')
+            anno_blob(ax[0],ch1_spotst,color='cyan')
+            anno_blob(ax[1],ch2_spotst,color='yellow')
+            ax[0].set_xticks([]); ax[0].set_yticks([])
+            ax[1].set_xticks([]); ax[1].set_yticks([])
             plt.tight_layout()
             plt.show()
     def map_to_uuid(self,ngroups):
         uuids = np.array([str(uuid.uuid4()) for _ in range(ngroups)])
         return uuids
-    def count_matrix(self,plot=False,z=None):
+    def count_matrix(self,plot=False):
         self.ch1_spots, self.ch2_spots = self.count()
-        self.ch1_spots, self.ch2_spots = self.filter_spots(self.ch1_spots,self.ch2_spots,z=z)
+        self.ch1_spots, self.ch2_spots = self.filter_spots(self.ch1_spots,self.ch2_spots)
         if plot:
             self.plot_spots(self.ch1_spots,self.ch2_spots)
         self.ch1_spots = self.ch1_spots.assign(gene='gapdh')
