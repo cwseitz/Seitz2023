@@ -47,10 +47,9 @@ class SpotCounts:
         ch2_spots = ch2_spots.loc[ch2_spots['label'] != 0]
         return ch1_spots, ch2_spots
     def get_rgb(self,ch0,ch1,ch2):
-        ch0_max = ch0.max()
-        ch1_max = ch1.max()
-        ch2_max = ch2.max()
-        rgb = np.dstack((ch2/ch2_max,ch1/ch1_max,ch0/ch0_max))
+        ch0 = ch0/ch0.max()
+        ch2 = ch2/ch2.max()
+        rgb = np.dstack((ch2,ch1,ch0))
         return rgb
     def filter_spots(self,ch1_spots,ch2_spots):
         ch1_int_thres = 300
@@ -66,17 +65,17 @@ class SpotCounts:
             np.random.shuffle(narray)
         for n in narray:
             print(f'Plotting spots in tile {n}')
-            fig, ax = plt.subplots(1,2,figsize=(9,6),sharex=True,sharey=True) 
+            fig, ax = plt.subplots(figsize=(6,6),sharex=True,sharey=True) 
             ch1_spotst = ch1_spots.loc[ch1_spots['tile'] == n]
             ch2_spotst = ch2_spots.loc[ch2_spots['tile'] == n]
+            ch0 = np.max(self.rawdata[:,0,n,:,:],axis=0)
             ch1 = np.max(self.rawdata[:,1,n,:,:],axis=0)
             ch2 = np.max(self.rawdata[:,2,n,:,:],axis=0)
-            ax[0].imshow(ch1,cmap='gray')
-            ax[1].imshow(100*ch2,cmap='gray')
-            anno_blob(ax[0],ch1_spotst,color='cyan')
-            anno_blob(ax[1],ch2_spotst,color='yellow')
-            ax[0].set_xticks([]); ax[0].set_yticks([])
-            ax[1].set_xticks([]); ax[1].set_yticks([])
+            zeros = np.zeros_like(ch1,dtype=np.float32)
+            rgb = self.get_rgb(ch0,zeros,ch2)
+            ax.imshow(rgb,cmap='gray')
+            anno_blob(ax,ch2_spotst,color='red')
+            ax.set_xticks([]); ax.set_yticks([])
             plt.tight_layout()
             plt.show()
     def map_to_uuid(self,ngroups):

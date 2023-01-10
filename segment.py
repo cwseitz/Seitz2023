@@ -82,12 +82,12 @@ class CellSegmenter:
                 viewer.window.resize(1500,1000)
                 mx = np.max(self.rawdata[:,1,n,:,:],axis=0)
                 viewer.add_image(mx,name='GAPDH',colormap='green',visible=True)
-                viewer.add_image(ch1_mask,name='Prefilter',colormap='gray',visible=True,opacity=0.1)
+                viewer.add_image(ch1_mask,name='Prefilter',colormap='gray',visible=True,opacity=0.05)
                 contours = find_contours(ch1_mask_filtered)
                 contours = [contour[::10] for contour in contours]
                 if len(contours) > 0:
-                    viewer.add_shapes(contours, shape_type='polygon', edge_width=5,
-                              edge_color='red', face_color='white', opacity=0.3, name='UNET')
+                    viewer.add_shapes(contours, shape_type='polygon', edge_width=20,
+                              edge_color='red', face_color='white', opacity=0.05, name='UNET')
                     napari.run()
                     labels = viewer.layers['UNET'].to_labels(labels_shape=ch1_mask.shape)
                     labels = label(labels).astype(np.uint16)

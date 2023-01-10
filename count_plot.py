@@ -7,7 +7,7 @@ import numpy as np
 import json
 
 prefixes = [
-'221218-Hela-IFNG-4h-1_1',
+#'221218-Hela-IFNG-4h-1_1',
 '221218-Hela-IFNG-16h-2_1',
 ]
 
@@ -17,7 +17,7 @@ with open('config.json', 'r') as f:
 counts = []
 for prefix in prefixes:
     sc = SpotCounts(config['datapath'],config['analpath'],prefix)
-    spots, count_matrix = sc.count_matrix(plot=False)
+    spots, count_matrix = sc.count_matrix(plot=True)
     count_matrix = count_matrix.loc[count_matrix['gapdh'] > 100]
     counts.append(count_matrix)
 time_df = pd.concat(counts)
