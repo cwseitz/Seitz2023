@@ -35,4 +35,10 @@ class Tiler:
         ch2 = ch2.reshape((nt*(nx-self.overlap),nt*(ny-self.overlap)))
         tifffile.imwrite(self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_ch2.tif',ch2)
         del ch2
-
+        print('Tiling Channel 3\n')
+        ch3 = np.asarray(X[:,3,:,:,:-self.overlap,:-self.overlap])
+        ch3 = np.max(ch3,axis=0) #max intensity projection
+        ch3 = ch3.swapaxes(1,2)
+        ch3 = ch3.reshape((nt*(nx-self.overlap),nt*(ny-self.overlap)))
+        tifffile.imwrite(self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_ch3.tif',ch3)
+        del ch3

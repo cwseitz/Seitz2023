@@ -1,6 +1,7 @@
 from tiler import Tiler
 from correct import Basic
 from detect import Detector
+from gptie import GPTIE
 #from nucleus_model import NucleusModel
 #from cell_model import CellBodyModel
 from segment import CellSegmenter
@@ -76,5 +77,13 @@ class Pipeline:
             cellsegment.segment()
         else:
             print('Mask files exist. Skipping')
+    def volume_contrast(self):
+        file = Path(self.analpath+self.prefix+'/'+self.prefix+'_ch3_gptie.tif')
+        if not file.exists():
+            print('Running GPTIE Model...')
+            gptie = GPTIE(self.datapath,self.analpath,self.prefix)
+            gptie.apply()
+        else:
+            print('Mask files exist. Skipping')      
   
 

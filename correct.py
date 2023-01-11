@@ -28,7 +28,7 @@ class Basic:
         axes[2].set_ylabel("Baseline")
         fig.tight_layout()
         plt.show()
-    def correct(self,plot=True):
+    def correct(self,plot=False):
         nt,nx,ny = 10,1844,1844
         path = self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_ch0.tif'
         ch0 = tifffile.imread(path)
@@ -83,3 +83,9 @@ class Basic:
         ch2_correct = ch2_correct.astype(np.uint16)
         path = self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_corrected_ch2.tif'
         tifffile.imwrite(path,ch2_correct)
+        
+        path = self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_ch3.tif'
+        ch3 = tifffile.imread(path)
+        ch3_blocks = self.blockshaped(ch3,1844,1844)
+        path = self.analpath+self.prefix+'/'+self.prefix+'_mxtiled_corrected_stack_ch3.tif'
+        tifffile.imwrite(path,ch3_blocks)
